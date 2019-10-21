@@ -88,36 +88,6 @@ document.addEventListener('mousemove', function (event) {
     }
 }, true);
 
-//======================================================================================================================
-// multiple users
-//======================================================================================================================
-
-function multipleUsers() {
-    let users = document.getElementsByClassName("user");
-    let posMap = {}
-    for (let i = 0; i < users.length; i++) {
-        if (posMap[users[i].style.gridArea] === undefined)
-            posMap[users[i].style.gridArea] = []
-        posMap[users[i].style.gridArea].push(users[i])
-    }
-    for (let k in posMap) {
-        if (posMap[k].length > 1) {
-            let width = Math.ceil(Math.sqrt(posMap[k].length));
-            let scale = 1 / width;
-            for (let i = 0; i < width; i++) {
-                for (let j = 0; j < width && i * width + j < posMap[k].length; j++) {
-                    posMap[k][i * width + j].style.transform = "scale(" + scale + ") translate(" +
-                        (((j / width) * 200 - 100) + 100 / width) * 1.2 + "%, " +
-                        (((i / width) * 200 - 100) + 100 / width) * 1.2 + "%)"
-                    posMap[k][i * width + j].children[0].style.margin = "0"
-                }
-            }
-        }
-    }
-}
-
-setTimeout(multipleUsers, 1000)
-
 //================================================================================================================================================
 //   Pathfinder
 //================================================================================================================================================
@@ -227,13 +197,10 @@ addCss(".user{pointer-events: none;}");
 addCss(".cell:not(.sel-start), .cell:not(.sel-end){ transition-duration: 1000ms;}");
 addCss(".no-duration{ transition-duration: 0ms !important;}");
 addCss("#pathfinder-ui{background-color: grey; color: white; border-radius: 3px; padding: 10px; position: absolute;" +
-    " right: 20px; top: 20px;}")
+    " right: 20px; top: 20px; text-align: center; width: 200px;}")
 addCss(".crosshair{cursor:crosshair;}")
 
 let target = null;
-
-// document.addEventListener("mousemove", function(event){
-
 
 function cellHover(event) {
     if (event.target.classList.contains("user"))
@@ -260,7 +227,6 @@ function setClickOnCells() {
     for (let i = 0; i < app.children.length; i++) {
         app.children[i].addEventListener("click", function (event) {
             if (event.currentTarget.classList.contains("sel-start")) {
-                console.log("sel")
                 selStart = event.currentTarget;
                 target = null;
                 selEnd = null;
@@ -330,7 +296,6 @@ function processPath() {
         currentCell = bestCell;
     }
     printResult(j);
-    console.log("Total moves needed: " + j);
     selStart.classList.remove("path")
     setTimeout(function () {
         cells.forEach(c => c.classList.remove("search-path"));
@@ -340,7 +305,7 @@ function processPath() {
 
 function eraseResult(){
     let pathResult = document.getElementById("path-result");
-    pathResult.innerHTML = "";
+    pathResult.innerHTML = "Sélectionnez une case de départ puis une case d'arrivée";
 }
 function printResult(dist){
     app.classList.remove("crosshair")
