@@ -155,13 +155,22 @@ function addPathfinderButton() {
 
 addPathfinderButton()
 
-let cells = [...app.children].filter(c => !c.classList.contains("user"))
-cells.forEach(c => c.classList.add("cell"))
-for (let i = 0; i < cells.length; i++) {
-    cells[i].addEventListener("mouseenter", cellHover)
+let cells;
+let isInit = false
+
+function init() {
+    if (isInit) return;
+    isInit = true;
+    cells = [...app.children].filter(c => !c.classList.contains("user"))
+    cells.forEach(c => c.classList.add("cell"))
+    for (let i = 0; i < cells.length; i++) {
+        cells[i].addEventListener("mouseenter", cellHover)
+    }
 }
+
 const maxValue = 99999999;
 function pathfinder() {
+    init();
     app.classList.add("crosshair")
     eraseResult();
     try {
