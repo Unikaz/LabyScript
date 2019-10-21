@@ -170,25 +170,30 @@ const tilesMoves = {
 let selStart = "";
 let selEnd = "";
 
-// function addPathfinderButton(){
-//     let div = document.createElement("div");
-//     div.style.borderRadius = "50%"
-//     div.style.width = "30px"
-//     div.style.height = "30px"
-//     div.style.position = "absolute"
-//     div.style.top = "10px"
-//     div.style.right = "10px"
-//     div.addEventListener("click", pathfinder)
-//     document.appendChild(div);
-// }
+function addPathfinderButton() {
+    let div = document.createElement("div");
+    div.setAttribute("id", "pathfinder-ui")
+    let btn = document.createElement("button")
+    btn.addEventListener("click", pathfinder)
+    btn.innerHTML = "Pathfinder"
+    div.appendChild(btn);
+    let res = document.createElement("div")
+    res.setAttribute("id", "path-result");
+    div.appendChild(res)
+    document.body.appendChild(div);
+}
+
+addPathfinderButton()
 
 let cells = [...app.children].filter(c => !c.classList.contains("user"))
 cells.forEach(c => c.classList.add("cell"))
 for (let i = 0; i < cells.length; i++) {
     cells[i].addEventListener("mouseenter", cellHover)
 }
-const maxValue = 99999999999999999999999999999;
+const maxValue = 99999999;
 function pathfinder() {
+    app.classList.add("crosshair")
+    eraseResult();
     try {
         document.getElementsByClassName("sel-start")[0].classList.remove("sel-start");
         document.getElementsByClassName("sel-end")[0].classList.remove("sel-end");
@@ -204,7 +209,13 @@ function pathfinder() {
 }
 
 function addCss(entry) {
-    let head = document.getElementsByTagName("style")[0];
+    let head;
+    try {
+        head = document.getElementsByTagName("style")[0];
+    }catch (e) {
+        let st = document.createElement("style");
+        head = document.getElementsByTagName("head")[0].appendChild(st);
+    }
     head.innerText += entry;
 }
 
@@ -215,6 +226,9 @@ addCss(".search-path{box-shadow: inset 0 0 10px white; transition-duration: 500m
 addCss(".user{pointer-events: none;}");
 addCss(".cell:not(.sel-start), .cell:not(.sel-end){ transition-duration: 1000ms;}");
 addCss(".no-duration{ transition-duration: 0ms !important;}");
+addCss("#pathfinder-ui{background-color: grey; color: white; border-radius: 3px; padding: 10px; position: absolute;" +
+    " right: 20px; top: 20px;}")
+addCss(".crosshair{cursor:crosshair;}")
 
 let target = null;
 
@@ -222,7 +236,6 @@ let target = null;
 
 
 function cellHover(event) {
-    // console.log("hover")
     if (event.target.classList.contains("user"))
         return;
     if (selStart != null && selEnd != null)
@@ -244,7 +257,6 @@ function cellHover(event) {
 setTimeout(setClickOnCells, 1000);
 
 function setClickOnCells() {
-    console.log("set " + app.children.length)
     for (let i = 0; i < app.children.length; i++) {
         app.children[i].addEventListener("click", function (event) {
             if (event.currentTarget.classList.contains("sel-start")) {
@@ -283,7 +295,7 @@ function processPath() {
             let neighbourValue = neighbour.dataset.value
             if (neighbourValue === undefined || parseInt(neighbourValue) > currentValue) {
                 if (neighbour.classList.contains("0")) {
-                    neighbour.dataset.value = 99999999;
+                    neighbour.dataset.value = maxValue + "";
                 } else {
                     neighbour.dataset.value = (currentValue + 1);
                     queue.push(neighbour)
@@ -317,12 +329,24 @@ function processPath() {
         currentCoords = getCoords(bestCell);
         currentCell = bestCell;
     }
+    printResult(j);
     console.log("Total moves needed: " + j);
     selStart.classList.remove("path")
     setTimeout(function () {
         cells.forEach(c => c.classList.remove("search-path"));
     }, 500)
 
+}
+
+function eraseResult(){
+    let pathResult = document.getElementById("path-result");
+    pathResult.innerHTML = "";
+}
+function printResult(dist){
+    app.classList.remove("crosshair")
+    let pathResult = document.getElementById("path-result");
+    pathResult.innerHTML = "" +
+        "Nb déplacements : " + dist;
 }
 
 let width = mapData.width;
@@ -363,6 +387,3 @@ function getCellAt(x, y) {
     let index = x * width + y;
     return app.children[index]
 }
-
-
-pathfinder()
