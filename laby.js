@@ -179,10 +179,8 @@ function pathfinder() {
 }
 
 function addCss(entry) {
-    let head;
-    try {
-        head = document.getElementsByTagName("style")[0];
-    }catch (e) {
+    let head = document.getElementsByTagName("style")[0];
+    if (head === undefined) {
         let st = document.createElement("style");
         head = document.getElementsByTagName("head")[0].appendChild(st);
     }
