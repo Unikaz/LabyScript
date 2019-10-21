@@ -167,8 +167,9 @@ function init() {
         cells[i].addEventListener("mouseenter", cellHover)
     }
 }
-
-const maxValue = 99999999;
+// todo implémenter une priorityQueue pour éviter de process trop de cases
+const maxValue = 99999999999;
+let arrivedCost = maxValue;
 function pathfinder() {
     init();
     app.classList.add("crosshair")
@@ -246,6 +247,7 @@ function setClickOnCells() {
 }
 
 function processPath() {
+    arrivedCost = maxValue;
     let endCoords = getCoords(selEnd);
     let startCoords = getCoords(selStart)
     selStart.dataset.value = "0";
@@ -255,7 +257,13 @@ function processPath() {
         let currentCell = queue.pop();
         currentCell.classList.add("search-path")
         let currentValue = parseInt(currentCell.dataset.value);
+        if(currentValue > arrivedCost) {
+            console.log("nope")
+            continue;
+        } // on ne process pas un trajet plus long que celui déjà trouvé
         let coords = getCoords(currentCell);
+        if(equalCoords(endCoords, coords))
+            arrivedCost = currentValue;
         let moves;
         for (let i = 0; i < currentCell.classList.length; i++) {
             if (tilesMoves.hasOwnProperty(currentCell.classList[i])) {
